@@ -1,13 +1,12 @@
 /* Ảnh đầu trang chủ: 2 ảnh xếp ngang, ảnh mặt tiền có biển hiện trước.
    Vuốt (điện thoại) hoặc kéo ngang bàn di chuột để sang ảnh sau — trình duyệt tự làm, không cần file này.
-   File này chỉ thêm: nút mũi tên trái/phải, chấm cho biết đang xem ảnh nào (bấm chấm để nhảy tới ảnh đó),
-   kéo bằng chuột trên máy tính. Không có JavaScript thì nút và chấm ẩn, vuốt vẫn chạy. */
+   File này chỉ thêm: nút mũi tên trái/phải, kéo bằng chuột trên máy tính.
+   Không có JavaScript thì nút ẩn, vuốt vẫn chạy. (Bỏ 2 chấm dưới ảnh theo yêu cầu 22/11/2026.) */
 (function () {
   var khung = document.querySelector('.hero-truot');
   if (!khung) return;
   var day = khung.querySelector('.hero-day');
   var trang = [].slice.call(day.children);
-  var cham = [].slice.call(khung.querySelectorAll('.hero-cham button'));
   var nutTruoc = khung.querySelector('.hero-truoc');
   var nutSau = khung.querySelector('.hero-sau');
   if (trang.length < 2) return;
@@ -20,12 +19,6 @@
     day.scrollTo({ left: trang[i].offsetLeft, behavior: giamChuyenDong ? 'auto' : 'smooth' });
   }
 
-  function danhDau(i) {
-    if (i === dangO) return;
-    dangO = i;
-    cham.forEach(function (c, k) { c.setAttribute('aria-current', k === i ? 'true' : 'false'); });
-  }
-
   // ảnh nào chiếm quá nửa khung thì coi là đang xem ảnh đó
   var choVe = false;
   day.addEventListener('scroll', function () {
@@ -33,13 +26,12 @@
     choVe = true;
     requestAnimationFrame(function () {
       choVe = false;
-      danhDau(Math.max(0, Math.min(trang.length - 1, Math.round(day.scrollLeft / day.clientWidth))));
+      dangO = Math.max(0, Math.min(trang.length - 1, Math.round(day.scrollLeft / day.clientWidth)));
     });
   }, { passive: true });
 
   nutTruoc.addEventListener('click', function () { toi(dangO - 1); });
   nutSau.addEventListener('click', function () { toi(dangO + 1); });
-  cham.forEach(function (c, k) { c.addEventListener('click', function () { toi(k); }); });
 
   // máy tính: giữ chuột kéo ngang như vuốt trên điện thoại.
   // Lúc kéo tạm tắt "hít" ảnh (class dang-keo), thả tay thì trượt tới ảnh đích rồi mới bật lại để khỏi giật.
